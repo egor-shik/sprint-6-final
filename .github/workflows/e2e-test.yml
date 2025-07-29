@@ -1,41 +1,23 @@
-name: autotests
-
-on:
-  push:
-    branches: '**'
-  pull_request:
-    branches: '**'
-
+name: Go
+on: [push, pull_request]
 jobs:
-
-  firstfloortest:
+  build:
     runs-on: ubuntu-latest
-    container: golang:1.24
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Download autotests binaries
-        uses: robinraju/release-downloader@v1.8
+      - uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v3
         with:
-          repository: Yandex-Practicum/go-autotests
-          latest: true
-          fileName: "*"
-          out-file-path: .tools
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup autotest binary
-        run: |
-          chmod -R +x $GITHUB_WORKSPACE/.tools
-          mv $GITHUB_WORKSPACE/.tools/firstfloortest /usr/local/bin/firstfloortest
-
-      - name: Build server binary
-        run: |
-          cd cmd/
-          go build -buildvcs=false -o server
-
-      - name: Run test
-        run: |
-          firstfloortest -test.v -test.run=^TestSprint6Final$ \
-            -server-binary-path=cmd/server
+          go-version: '1.21'
+          
+      - name: Build
+        run: go build ./cmd/main.go
+          
+      - name: Test
+        run: go test ./...
+          
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.52

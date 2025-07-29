@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	logger := log.New(os.Stdout, "MORSE CONVERTER: ", log.LstdFlags|log.Lshortfile)
 
 	// Пробуем порты по очереди
