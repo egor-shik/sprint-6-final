@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+var (
+	httpClient = &http.Client{
+		Timeout: 10 * time.Second,
+	}
+)
+
 const maxUploadSize = 1024 * 1024 // 1MB
 
 func Init(logger interface{}) {}

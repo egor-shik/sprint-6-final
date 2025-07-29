@@ -1,11 +1,11 @@
 package server
 
 import (
+	"context"
 	"log"
 	"net/http"
-	"time"
-
 	"sprint-6-final/internal/handlers"
+	"time"
 )
 
 type Server struct {
@@ -14,10 +14,6 @@ type Server struct {
 }
 
 func New(logger *log.Logger, port string) *Server {
-	if port == "" {
-		port = "8080"
-	}
-
 	return &Server{
 		httpServer: &http.Server{
 			Addr:         ":" + port,
@@ -32,17 +28,16 @@ func New(logger *log.Logger, port string) *Server {
 }
 
 func (s *Server) Start() error {
-	s.logger.Printf("Starting server on %s", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
 
-// createRouter создает и настраивает HTTP роутер
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
+}
+
 func createRouter() *http.ServeMux {
 	router := http.NewServeMux()
-
-	// Регистрируем обработчики
 	router.HandleFunc("/", handlers.IndexHandler)
 	router.HandleFunc("/upload", handlers.UploadHandler)
-
 	return router
 }
