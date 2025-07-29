@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sprint-6-final/internal/service"
 	"time"
-
-	"github.com/egor-shik/sprint-6-final/service"
 )
 
 const maxUploadSize = 1024 * 1024 // 1MB
 
-// IndexHandler обрабатывает запрос к корневому эндпоинту и возвращает HTML
+func Init(logger interface{}) {}
+
+// IndexHandler обрабатывает запрос к корневому эндпоинту
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

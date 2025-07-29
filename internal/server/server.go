@@ -5,34 +5,35 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/egor-shik/sprint-6-final/handlers"
+	"sprint-6-final/internal/handlers"
 )
 
-// Server структура для хранения сервера и логгера
 type Server struct {
-	logger     *log.Logger
 	httpServer *http.Server
+	logger     *log.Logger
 }
 
-// New создает и настраивает новый экземпляр сервера
-func New(logger *log.Logger) *Server {
-	// Создаем роутер
-	router := createRouter()
-
-	// Настраиваем HTTP сервер
-	httpServer := &http.Server{
-		Addr:         ":8080",
-		Handler:      router,
-		ErrorLog:     logger,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+func New(logger *log.Logger, port string) *Server {
+	if port == "" {
+		port = "8080"
 	}
 
 	return &Server{
-		logger:     logger,
-		httpServer: httpServer,
+		httpServer: &http.Server{
+			Addr:         ":" + port,
+			Handler:      createRouter(),
+			ErrorLog:     logger,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+			IdleTimeout:  15 * time.Second,
+		},
+		logger: logger,
 	}
+}
+
+func (s *Server) Start() error {
+	s.logger.Printf("Starting server on %s", s.httpServer.Addr)
+	return s.httpServer.ListenAndServe()
 }
 
 // createRouter создает и настраивает HTTP роутер
@@ -44,10 +45,4 @@ func createRouter() *http.ServeMux {
 	router.HandleFunc("/upload", handlers.UploadHandler)
 
 	return router
-}
-
-// Start запускает HTTP сервер
-func (s *Server) Start() error {
-	s.logger.Printf("Starting server on %s", s.httpServer.Addr)
-	return s.httpServer.ListenAndServe()
 }
